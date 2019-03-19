@@ -8,9 +8,6 @@
     android:layout_height="fill_parent"
     tools:context=".MainActivity">
 
-
-
-
     <Button
         android:id="@+id/part1"
         android:layout_width="fill_parent"
@@ -31,8 +28,10 @@
         android:text="Seconde part"
         android:layout_below="@+id/part1"/>
 
-
-    <include layout="@layout/activity_map" />
+    <include layout="@layout/activity_map"
+        android:layout_below="@id/part2"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent" />
 
 
 
