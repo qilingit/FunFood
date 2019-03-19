@@ -1,13 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     tools:context=".MainActivity">
 
+<<<<<<< HEAD
+    <include layout="@layout/activity_filter"/>
+
+    <include layout="@layout/activity_map"
+        android:layout_below="@+id/filter_layout"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"/>
+=======
     <Button
         android:id="@+id/part1"
         android:layout_width="fill_parent"
@@ -36,5 +43,6 @@
 
 
 
+>>>>>>> 2fa2df956933d2b2eaef35f37c666108737e179f
 
 </RelativeLayout>

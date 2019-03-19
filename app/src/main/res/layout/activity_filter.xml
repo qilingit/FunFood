@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="90dp"
+    android:background="@color/colorCitron"
+    android:orientation="horizontal"
+    android:id="@+id/filter_layout">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_margin="10.5dp"
+            android:orientation="horizontal"
+           >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="10.5dp"
+                android:textColor="@color/colorWith"
+                android:text="@string/text_type"
+                android:textStyle="bold"/>
+
+
+            <Spinner
+                android:id="@+id/spinnerType"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10.5dp"
+                android:entries="@array/spinner_array"
+                android:spinnerMode="dropdown"
+                android:prompt="@string/spinner_default_choice"/>
+
+        </LinearLayout>
+    <Button
+        android:layout_width="60dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:text="@string/go_button"
+        android:id="@+id/buttonGo"/>
+
+</LinearLayout>
