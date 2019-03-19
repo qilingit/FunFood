@@ -1,39 +1,66 @@
 package com.example.funfood;
 
-import android.support.annotation.NonNull;
+import android.app.Dialog;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.Toast;
 
-import com.mapbox.mapboxsdk.Mapbox;
-import com.mapbox.mapboxsdk.constants.Style;
-import com.mapbox.mapboxsdk.maps.MapView;
-import com.mapbox.mapboxsdk.maps.MapboxMap;
-import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
 
-public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
-
-    private MapView map;
-    private MapboxMap mapbox;
+public class MainActivity extends AppCompatActivity {
+    private static final String TAG = "MainActivity";
+    private static final int ERROR_DIALOG_REQUEST = 9001;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Mapbox.getInstance(this, "pk.eyJ1IjoiaGF0b3UiLCJhIjoiY2p0NXQzcm9kMDdtYTRhbnZ2ZHh2OGFwZiJ9.QF8RTZm-41OkTzTuvVO-HA");
-
         setContentView(R.layout.activity_main);
 
-        map = findViewById(R.id.theMap);
-        map.onCreate(savedInstanceState);
-        map.getMapAsync(this);
+        if(isServicesOK()) {
+            init();
+        }
+    }
 
+
+
+    private void init() {
+        /*Button btnMap = findViewById(R.id.part1);
+        btnMap.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, MapActivity.class);
+                startActivity(intent);
+            }
+        });*/
+        /*Intent intent = new Intent(MainActivity.this, MapActivity.class);
+        startActivity(intent);*/
 
     }
 
-    @Override
-    public void onMapReady(@NonNull MapboxMap mapboxMap) {
-        this.mapbox = mapboxMap;
-        if(mapbox != null){
-            mapbox.setStyleUrl(Style.DARK);
+    public Boolean isServicesOK() {
+        Log.d(TAG, "isServiceOK : checking google service   ");
+
+        int available = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(MainActivity.this);
+
+        if(available == ConnectionResult.SUCCESS) {
+            // everything is fine and the user can make map requests
+            Log.d(TAG, "isServiceOK: Google Play Services is working");
+            return true;
         }
+        else if (GoogleApiAvailability.getInstance().isUserResolvableError(available)) {
+            // an error occurred but we can resolve it
+            Log.d(TAG, "isServiceOK: an error occurred but we can fix it");
+            Dialog dialog = GoogleApiAvailability.getInstance().getErrorDialog(MainActivity.this, available, ERROR_DIALOG_REQUEST);
+            dialog.show();
+        } else {
+            Toast.makeText(this, "You can't make any requests", Toast.LENGTH_SHORT);
+        }
+        return false;
     }
 }
