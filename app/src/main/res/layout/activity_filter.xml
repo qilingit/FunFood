@@ -24,11 +24,21 @@
 
 
             <Spinner
+<<<<<<< HEAD
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/spinnerType"
                 android:layout_margin="10.5dp"
                  />
+=======
+                android:id="@+id/spinnerType"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10.5dp"
+                android:entries="@array/spinner_array"
+                android:spinnerMode="dropdown"
+                android:prompt="@string/spinner_default_choice"/>
+>>>>>>> qilin
 
         </LinearLayout>
     <Button

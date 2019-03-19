@@ -3,13 +3,25 @@
     <string name="google_maps_API_key">AIzaSyD_6VMj2hIvNySuIzflB2YkCw-wDTPnxdI</string>
     <string name="text_type">Quel type ?</string>
     <string name="go_button">GO</string>
+<<<<<<< HEAD
     <string name="choice_spinner">Choisissez un type de restaurant</string>
 
     <string-array name="spinner_array">
+=======
+    <string name="spinner_default_choice">Choisissez un type de restaurant</string>
+
+    <string-array name="spinner_array">
+        <item>Tous</item>
+>>>>>>> qilin
         <item>Français</item>
         <item>Chinois</item>
         <item>Fast Food</item>
         <item>Japonais</item>
     </string-array>
 
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> qilin
 </resources>
