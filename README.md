@@ -14,4 +14,4 @@
 - 2, `git pull origin master`
 - 3, `git merge test`
 - 4, `git push origin master`
-- 5, `git status (for verify everything is pushed)`
+- 5, `git status` (for verify everything is pushed)
