@@ -1,4 +1,15 @@
 <resources>
     <string name="app_name">FunFood</string>
     <string name="google_maps_API_key">AIzaSyD_6VMj2hIvNySuIzflB2YkCw-wDTPnxdI</string>
+    <string name="text_type">Quel type ?</string>
+    <string name="go_button">GO</string>
+    <string name="choice_spinner">Choisissez un type de restaurant</string>
+
+    <string-array name="spinner_array">
+        <item>Français</item>
+        <item>Chinois</item>
+        <item>Fast Food</item>
+        <item>Japonais</item>
+    </string-array>
+
 </resources>

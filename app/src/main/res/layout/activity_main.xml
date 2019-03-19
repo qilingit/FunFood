@@ -1,41 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     tools:context=".MainActivity">
 
+    <include layout="@layout/activity_filter"/>
 
-
-
-    <Button
-        android:id="@+id/part1"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="First part"/>
-    <!--
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Map"
-        android:id="@+id/btnMap"/>
-
-        -->
-    <Button
-        android:id="@+id/part2"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="Seconde part"
-        android:layout_below="@+id/part1"/>
-
-
-    <include layout="@layout/activity_map" />
-
-
-
-
+    <include layout="@layout/activity_map"
+        android:layout_below="@+id/filter_layout"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"/>
 
 </RelativeLayout>
