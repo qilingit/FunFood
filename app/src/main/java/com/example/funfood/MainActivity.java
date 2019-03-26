@@ -1,8 +1,10 @@
 package com.example.funfood;
 
+import android.app.Dialog;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -12,9 +14,18 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
+import android.widget.Toast;
+
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+    private static final String TAG = "MainActivity";
+    private static final int ERROR_DIALOG_REQUEST = 9001;
+    private Spinner spinnerType;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,8 +105,45 @@ public class MainActivity extends AppCompatActivity
 
         }*/
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void initSpinner() {
+        //Récupération des Spinners déclarés dans le fichier activity_filter.xml de res/layout
+        spinnerType = findViewById(R.id.spinnerType);
+
+
+        /*On passe à l'adapate le context, le tableau de string et un fichier de presentation par défaut*/
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                R.array.spinner_array, android.R.layout.simple_spinner_item);
+
+        /* On definit une présentation du spinner quand il est déroulé (android.R.layout.simple_spinner_dropdown_item) */
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        //Enfin on passe l'adapter au Spinner
+        spinnerType.setAdapter(adapter);
+    }
+
+    public Boolean isServicesOK() {
+        Log.d(TAG, "isServiceOK : checking google service   ");
+
+        int available = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(MainActivity.this);
+
+        if(available == ConnectionResult.SUCCESS) {
+            // everything is fine and the user can make map requests
+            Log.d(TAG, "isServiceOK: Google Play Services is working");
+            return true;
+        }
+        else if (GoogleApiAvailability.getInstance().isUserResolvableError(available)) {
+            // an error occurred but we can resolve it
+            Log.d(TAG, "isServiceOK: an error occurred but we can fix it");
+            Dialog dialog = GoogleApiAvailability.getInstance().getErrorDialog(MainActivity.this, available, ERROR_DIALOG_REQUEST);
+            dialog.show();
+        } else {
+            Toast.makeText(this, "You can't make any requests", Toast.LENGTH_SHORT).show();
+        }
+        return false;
     }
 }
