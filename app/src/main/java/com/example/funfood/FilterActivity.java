@@ -13,7 +13,7 @@ public class FilterActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_filter);
+        setContentView(R.layout.layout_filter);
 
         initSpinner();
 
