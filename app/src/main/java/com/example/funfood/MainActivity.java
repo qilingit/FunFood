@@ -28,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
         if(isServicesOK()) {
             init();
         }
-        //initSpinner();
+        initSpinner();
     }
 
 
