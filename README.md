@@ -14,9 +14,7 @@
 - 2, `git pull origin master`
 - 3, `git merge test`
 - 4, `git push origin master`
-<<<<<<< HEAD
 - 5, `git status` (for verify everything is pushed)
-=======
 - 5, `git status (for verify everything is pushed)`
 
 ### How to pull codes from master quand on est sur  une branche "test" :
@@ -24,4 +22,3 @@
 - 1, git checkout test      # gets you "on branch test"
 - 2, git fetch origin        # gets you up to date with origin
 - 3, git merge origin/master
->>>>>>> qilin
