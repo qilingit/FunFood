@@ -11,7 +11,7 @@
 
     <include layout="@layout/layout_filter"/>
 
-    <include layout="@layout/layout_map"
+    <include layout="@layout/fragment_map"
         android:layout_below="@+id/filter_layout"
         android:layout_height="match_parent"
         android:layout_width="match_parent"/>
