@@ -23,4 +23,11 @@
         <item>Japonais</item>
     </string-array>
 
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment_history">Hello blank fragment</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="msg_about_fragment">Cette application est développée pour le cours TPALT</string>
+    <string name="msg_favorie_fragment">Favorite fragment</string>
+
 </resources>

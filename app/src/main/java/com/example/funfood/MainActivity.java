@@ -1,11 +1,13 @@
 package com.example.funfood;
 
 import android.app.Dialog;
+import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+import android.support.annotation.NonNull;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
-import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -18,40 +20,71 @@ import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.example.funfood.fragment.FragmentAbout;
+import com.example.funfood.fragment.FragmentFavorie;
+import com.example.funfood.fragment.FragmentHistory;
+import com.example.funfood.fragment.FragmentMap;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, FragmentHistory.OnFragmentInteractionListener,
+                    FragmentFavorie.OnFragmentInteractionListener, FragmentAbout.OnFragmentInteractionListener {
     private static final String TAG = "MainActivity";
     private static final int ERROR_DIALOG_REQUEST = 9001;
     private Spinner spinnerType;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.layout_main);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        //===================
+        if (savedInstanceState == null) {
+            Fragment fragment = null;
+            Class fragmentClass = null;
+            fragmentClass = FragmentMap.class;
+            try {
+                fragment = (Fragment) fragmentClass.newInstance();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            fragmentManager.beginTransaction().replace(R.id.flContent, fragment).commit();
+        }
+        //======
+
+
+        /*FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+               *//* MapActivity map = new MapActivity();
+                map.initMap();*//*
+                *//*MapActivity  mapActivity = new MapActivity();
+                mapActivity.onMapReady(new GoogleMap());*//*
                 Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             }
-        });
+        });*/
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        /*
+        Intent intent = new Intent(MainActivity.this, MapActivity.class);
+        startActivity(intent);*/
     }
 
     @Override
@@ -88,22 +121,34 @@ public class MainActivity extends AppCompatActivity
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
-
-        /*if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else */if (id == R.id.nav_map) {
-
+        Fragment fragment = null;
+        Class fragmentClass = null;
+        if (id == R.id.nav_map) {
+            Log.d("Click map : ", "clicked");
+            //FragmentMap fragment=  getFragmentManager().findFragmentById(R.id.map);/
+            fragmentClass = FragmentMap.class;
+            //addMapFragment(new FragmentMap(), true, "Map");
         } else if (id == R.id.nav_history) {
-
+            fragmentClass = FragmentHistory.class;
         } else if (id == R.id.nav_favorite) {
+            fragmentClass = FragmentFavorie.class;
         } else if (id == R.id.nav_about) {
+            fragmentClass = FragmentAbout.class;
+        }
 
-        }/* else if (id == R.id.nav_send) {
+        try{
+            fragment = (Fragment) fragmentClass.newInstance();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        }
 
-        }*/
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.beginTransaction().replace(R.id.flContent, fragment).commit();
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
@@ -145,5 +190,21 @@ public class MainActivity extends AppCompatActivity
             Toast.makeText(this, "You can't make any requests", Toast.LENGTH_SHORT).show();
         }
         return false;
+    }
+
+    public void addMapFragment(Fragment fragment, boolean addToBackStack, String tag) {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+
+        if(addToBackStack){
+            fragmentTransaction.addToBackStack(tag);
+        }
+        fragmentTransaction.add(fragment, tag);
+        fragmentTransaction.commitAllowingStateLoss();
+    }
+
+    @Override
+    public void onFragmentInteraction(Uri uri) {
+
     }
 }
