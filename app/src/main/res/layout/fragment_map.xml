@@ -7,40 +7,32 @@
     android:orientation="vertical">
 
     <include layout="@layout/layout_filter"/>
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
     <fragment
-        android:name="com.google.android.gms.maps.SupportMapFragment"
+        class="com.google.android.gms.maps.SupportMapFragment"
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="fill_parent"
-        android:layout_height="0dp"
+        android:layout_height="match_parent"
         android:layout_weight="1"
-        android:id="@+id/map"
+        android:id="@+id/map_fragment"
         tools:context=".fragment.FragmentMap"
         android:layout_gravity="bottom"/>
-    <!--
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="38dp"
-        android:textColor="@color/colorWith"
-        android:text="@string/text_type"
-        android:textStyle="bold"
-        android:background="@color/colorPrimary"/>
 
 
-    <Spinner
-        android:layout_width="wrap_content"
-        android:layout_height="42dp"
-        android:id="@+id/spinnerType"
-        android:layout_margin="0dp"
-        android:entries="@array/spinner_array"
-        android:spinnerMode="dropdown"
-        android:textAlignment="center"
-        android:layoutDirection="inherit"
-        android:background="@color/colorPrimary"
-        android:layout_gravity="right"
 
-        />
-        -->
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/actualPosition_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_margin="@dimen/fab_margin"
+            app:srcCompat="@android:drawable/ic_menu_mylocation" />
+
+    </FrameLayout>
+
     <!--
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/locationBtn"

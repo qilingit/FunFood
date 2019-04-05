@@ -1,9 +1,11 @@
 package com.example.funfood;
 
 import android.app.Dialog;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -16,7 +18,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -33,8 +37,6 @@ public class MainActivity extends AppCompatActivity
     private static final String TAG = "MainActivity";
     private static final int ERROR_DIALOG_REQUEST = 9001;
     private Spinner spinnerType;
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,21 +60,6 @@ public class MainActivity extends AppCompatActivity
             FragmentManager fragmentManager = getSupportFragmentManager();
             fragmentManager.beginTransaction().replace(R.id.flContent, fragment).commit();
         }
-        //======
-
-
-        /*FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-               *//* MapActivity map = new MapActivity();
-                map.initMap();*//*
-                *//*MapActivity  mapActivity = new MapActivity();
-                mapActivity.onMapReady(new GoogleMap());*//*
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });*/
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -82,10 +69,17 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-        /*
-        Intent intent = new Intent(MainActivity.this, MapActivity.class);
-        startActivity(intent);*/
     }
+
+    // Send the permission request result to FragmentMap
+/*    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if(requestCode == FragmentMap.MY_PERMISSIONS_REQUEST_LOCATION){
+            getMapFragment().onRequestPermissionsResult(requestCode, permissions, grantResults);
+        } else {
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+    }*/
 
     @Override
     public void onBackPressed() {
@@ -119,6 +113,10 @@ public class MainActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
+    FragmentMap getMapFragment(){
+        return (FragmentMap)getSupportFragmentManager().findFragmentById(R.id.map_fragment);
+    }
+
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -128,8 +126,25 @@ public class MainActivity extends AppCompatActivity
         Class fragmentClass = null;
         if (id == R.id.nav_map) {
             Log.d("Click map : ", "clicked");
-            //FragmentMap fragment=  getFragmentManager().findFragmentById(R.id.map);/
+
             fragmentClass = FragmentMap.class;
+            FloatingActionButton btnActualPosition = findViewById(R.id.actualPosition_btn);
+
+            /*btnActualPosition.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    FragmentMap map = getMapFragment();
+                    Location loc = map.getMyLocation();
+                    if (loc != null) {
+                        LatLng latLng = new LatLng(loc.getLatitude(), loc
+                                .getLongitude());
+                        cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 17);
+                        map.animateCamera(cameraUpdate);
+
+                    }
+                    Log.d("Map", "clicked");
+                }
+            });*/
             //addMapFragment(new FragmentMap(), true, "Map");
         } else if (id == R.id.nav_history) {
             fragmentClass = FragmentHistory.class;

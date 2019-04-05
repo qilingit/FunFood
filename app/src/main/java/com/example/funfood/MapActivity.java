@@ -40,6 +40,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         setContentView(R.layout.fragment_map);
 
         getLocationPermission();
+
     }
 
 
@@ -120,7 +121,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     public void initMap() {
         Log.d(TAG, "initMap: initialize map");
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map_fragment);
         mapFragment.getMapAsync(MapActivity.this);
     }
 
