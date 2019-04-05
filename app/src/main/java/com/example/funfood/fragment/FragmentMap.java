@@ -81,6 +81,8 @@ public class FragmentMap extends Fragment
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        mContext = getContext();
         mLocationListener = new LocationListener() {
             @Override
             public void onLocationChanged(final Location location) {
