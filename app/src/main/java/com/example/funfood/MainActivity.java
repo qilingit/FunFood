@@ -30,6 +30,8 @@ import com.example.funfood.fragment.FragmentHistory;
 import com.example.funfood.fragment.FragmentMap;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.model.LatLng;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, FragmentHistory.OnFragmentInteractionListener,
@@ -60,6 +62,8 @@ public class MainActivity extends AppCompatActivity
             FragmentManager fragmentManager = getSupportFragmentManager();
             fragmentManager.beginTransaction().replace(R.id.flContent, fragment).commit();
         }
+
+
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -128,23 +132,7 @@ public class MainActivity extends AppCompatActivity
             Log.d("Click map : ", "clicked");
 
             fragmentClass = FragmentMap.class;
-            FloatingActionButton btnActualPosition = findViewById(R.id.actualPosition_btn);
 
-            /*btnActualPosition.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    FragmentMap map = getMapFragment();
-                    Location loc = map.getMyLocation();
-                    if (loc != null) {
-                        LatLng latLng = new LatLng(loc.getLatitude(), loc
-                                .getLongitude());
-                        cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 17);
-                        map.animateCamera(cameraUpdate);
-
-                    }
-                    Log.d("Map", "clicked");
-                }
-            });*/
             //addMapFragment(new FragmentMap(), true, "Map");
         } else if (id == R.id.nav_history) {
             fragmentClass = FragmentHistory.class;
