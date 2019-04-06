@@ -25,7 +25,7 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.example.funfood.fragment.FragmentAbout;
-import com.example.funfood.fragment.FragmentFavorie;
+import com.example.funfood.fragment.FragmentFavorite;
 import com.example.funfood.fragment.FragmentHistory;
 import com.example.funfood.fragment.FragmentMap;
 import com.google.android.gms.common.ConnectionResult;
@@ -35,7 +35,7 @@ import com.google.android.gms.maps.model.LatLng;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, FragmentHistory.OnFragmentInteractionListener,
-                    FragmentFavorie.OnFragmentInteractionListener, FragmentAbout.OnFragmentInteractionListener {
+                    FragmentFavorite.OnFragmentInteractionListener, FragmentAbout.OnFragmentInteractionListener {
     private static final String TAG = "MainActivity";
     private static final int ERROR_DIALOG_REQUEST = 9001;
     private Spinner spinnerType;
@@ -137,7 +137,7 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_history) {
             fragmentClass = FragmentHistory.class;
         } else if (id == R.id.nav_favorite) {
-            fragmentClass = FragmentFavorie.class;
+            fragmentClass = FragmentFavorite.class;
         } else if (id == R.id.nav_about) {
             fragmentClass = FragmentAbout.class;
         }

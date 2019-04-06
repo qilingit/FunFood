@@ -3,12 +3,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragment.FragmentFavorie">
+    tools:context=".fragment.FragmentFavorite">
 
     <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <ListView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="@string/msg_favorie_fragment" />
+        android:id="@+id/listViewDetails"/>
 
 </FrameLayout>

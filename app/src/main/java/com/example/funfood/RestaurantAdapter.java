@@ -1,12 +1,16 @@
 package com.example.funfood;
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -33,7 +37,7 @@ public class RestaurantAdapter extends ArrayAdapter<Restaurant> {
             view = convertView;
         }
 
-        Restaurant restaurant = getItem(position);
+        final Restaurant restaurant = getItem(position);
 
         if (restaurant!=null) {
 
@@ -41,8 +45,34 @@ public class RestaurantAdapter extends ArrayAdapter<Restaurant> {
             TextView nomView = view.findViewById(R.id.nom_resto);
             nomView.setText(restaurant.getNom());
 
-            ImageView imageRestaurant = view.findViewById(restaurant.getImage());
+            final ImageView imageRestaurant = view.findViewById(restaurant.getImage());
             imageRestaurant.setImageResource(R.drawable.img_casa_di_panini);
+
+            ImageButton shareBtn = view.findViewById(R.id.share_btn);
+
+            shareBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent sendIntent = new Intent();
+                    sendIntent.setAction(Intent.ACTION_SEND);
+                    sendIntent.putExtra(Intent.EXTRA_TEXT, restaurant.getNom());
+                    sendIntent.setType("text/plain");
+                    getContext().startActivity(sendIntent);
+
+                }
+            });
+
+            ImageButton callBtn = view.findViewById(R.id.call_btn);
+
+            callBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(Intent.ACTION_DIAL);
+                    intent.setData(Uri.parse("tel:0760371766"));
+                    getContext().startActivity(intent); 
+                }
+            });
+
         }
 
         return view;

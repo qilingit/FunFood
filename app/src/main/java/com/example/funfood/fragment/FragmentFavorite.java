@@ -3,23 +3,30 @@ package com.example.funfood.fragment;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ListView;
 
 import com.example.funfood.R;
+import com.example.funfood.Restaurant;
+import com.example.funfood.RestaurantAdapter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link FragmentFavorie.OnFragmentInteractionListener} interface
+ * {@link FragmentFavorite.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link FragmentFavorie#newInstance} factory method to
+ * Use the {@link FragmentFavorite#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class FragmentFavorie extends Fragment {
+public class FragmentFavorite extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -31,7 +38,7 @@ public class FragmentFavorie extends Fragment {
 
     private OnFragmentInteractionListener mListener;
 
-    public FragmentFavorie() {
+    public FragmentFavorite() {
         // Required empty public constructor
     }
 
@@ -44,8 +51,8 @@ public class FragmentFavorie extends Fragment {
      * @return A new instance of fragment FragmentFavorie.
      */
     // TODO: Rename and change types and number of parameters
-    public static FragmentFavorie newInstance(String param1, String param2) {
-        FragmentFavorie fragment = new FragmentFavorie();
+    public static FragmentFavorite newInstance(String param1, String param2) {
+        FragmentFavorite fragment = new FragmentFavorite();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -63,10 +70,22 @@ public class FragmentFavorie extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_favorite, container, false);
+        View view = inflater.inflate(R.layout.fragment_favorite, container, false);
+
+        ListView lv = view.findViewById(R.id.listViewDetails);
+
+        ArrayList<Restaurant> restaurants = new ArrayList<>();
+        restaurants.add(new Restaurant("La Casa di Panini", "15 Avenue de Paris"));
+        restaurants.add(new Restaurant("O'Tacos", "17 Avenue de Paris"));
+        restaurants.add(new Restaurant("Pizza Five", "18 Avenue de Paris"));
+
+        RestaurantAdapter adapter = new RestaurantAdapter(getContext(), R.layout.layout_details, restaurants);
+        lv.setAdapter(adapter);
+
+        return view;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
