@@ -66,6 +66,9 @@ public class FragmentMap extends Fragment
         implements OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener{
+    static final int TWO_MINUTES = 1000 * 60 * 2;
+    private static final String TAG = "FragmentMap";
+
     public ArrayList<MarkerOptions> markerList = new ArrayList<>();
     public List<Result> results;
     GoogleMap mGoogleMap;
@@ -74,14 +77,11 @@ public class FragmentMap extends Fragment
     GoogleApiClient mGoogleApiClient;
     Location mLastLocation;
     Marker mCurrLocationMarker;
-    private static final String TAG = "FragmentMap";
     public Context mContext;
     private LocationListener mLocationListener;
     private LocationManager mLocationManager;
-    //private LatLng currentLocation;
     private Spinner mySpinner;
-    private Location currentBestLocation = null;
-    static final int TWO_MINUTES = 1000 * 60 * 2;
+    public Location currentBestLocation = null;
     private UpdateMap updateMap = new UpdateMap();
     private View rootView;
     private SupportMapFragment mapFragment;
@@ -100,7 +100,6 @@ public class FragmentMap extends Fragment
         currentBestLocation = getLastBestLocation();
 
 
-
         Log.d("OnCreate", "Passed");
         //use SuppoprtMapFragment for using in fragment instead of activity  FragmentMap = activity   SupportMapFragment = fragment
         mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map_fragment);
@@ -114,31 +113,32 @@ public class FragmentMap extends Fragment
         }
 
         mapFragment.getMapAsync(new OnMapReadyCallback() {
-                                    @Override
-                                    public void onMapReady(GoogleMap myMap) {
-                                        if (myMap != null) {
-                                            myMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-                                            myMap.clear();
+            @Override
+            public void onMapReady(GoogleMap myMap) {
+                if (myMap != null) {
+                    myMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+                    myMap.clear();
 
-                                            myMap.getUiSettings().setAllGesturesEnabled(true);
-                                            getMyLocation();
-                                            //myMap.setMyLocationEnabled(true);
-                                            CameraPosition cameraCurrentLocation = CameraPosition.builder()
-                                                    .target(new LatLng(currentBestLocation.getLatitude(), currentBestLocation.getLongitude()))
-                                                    .zoom(16)
-                                                    .bearing(0)
-                                                    .tilt(45)
-                                                    .build();
+                    myMap.getUiSettings().setAllGesturesEnabled(true);
+                    getMyLocation();
+                    //myMap.setMyLocationEnabled(true);
+                    CameraPosition cameraCurrentLocation = CameraPosition.builder()
+                            .target(new LatLng(currentBestLocation.getLatitude(), currentBestLocation.getLongitude()))
+                            .zoom(16)
+                            .bearing(0)
+                            .tilt(45)
+                            .build();
 
-                                            myMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraCurrentLocation), 2000, null);
-                                            myMap.addMarker(new MarkerOptions()
-                                                    .position(new LatLng(currentBestLocation.getLatitude(), currentBestLocation.getLongitude()))
-                                                    .title("UPMC")
-                                                    .icon(bitmapDescriptorFromVector(getActivity(), R.drawable.ic_place_black_24dp)));
-                                            Log.d("FragmentMap", "addMarker");
-                                        }
-                                    }
-                                }
+                    myMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraCurrentLocation), 2000, null);
+                    myMap.addMarker(new MarkerOptions()
+                            .position(new LatLng(currentBestLocation.getLatitude(), currentBestLocation.getLongitude()))
+                            .title("UPMC")
+                            .icon(bitmapDescriptorFromVector(getActivity(), R.drawable.ic_place_black_24dp)));
+                    Log.d("FragmentMap", "addMarker");
+                    mGoogleMap = myMap;
+                }
+            }
+        }
 
         );
 
@@ -214,6 +214,7 @@ public class FragmentMap extends Fragment
                 }
                 requestRestaurant(parent.getItemAtPosition(position).toString());
 
+                mGoogleMap.clear();
                 updateMap.showMarker(mGoogleMap, markerList, results);
 
                 //updateMap.showMarker(myMap, markerList);
@@ -230,7 +231,6 @@ public class FragmentMap extends Fragment
         mapFragment.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(GoogleMap myMap) {
-                mGoogleMap = myMap;
                 myMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
                 myMap.clear();
 
@@ -262,7 +262,9 @@ public class FragmentMap extends Fragment
                     Log.d("****updateMarker", "passed");
 
                 }
-                updateMap.showMarker(myMap, markerList, results);
+
+                mGoogleMap = myMap;
+                //updateMap.showMarker(myMap, markerList, results);
             }
         });
         mapFragment.getMapAsync(this);
@@ -330,6 +332,10 @@ public class FragmentMap extends Fragment
 
     }
 
+    /**
+     *
+     * @return
+     */
     private Location getLastBestLocation() {
         if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -532,7 +538,9 @@ public class FragmentMap extends Fragment
 
     }
 
-    /**/
+    /**
+     *
+     */
     public void requestRestaurant(String cusineType){
         Log.d("request", "clicked" + ", Type" + cusineType);
         //Log.d("Position", String.valueOf(currentLocation.latitude) + String.valueOf(currentLocation.longitude));
@@ -549,7 +557,7 @@ public class FragmentMap extends Fragment
             results.removeAll(results);
         }
         GoogleMapAPI googleMapAPI = APIClient.getClient().create(GoogleMapAPI.class);
-        googleMapAPI.getNearBy(currentLocation, radius, type, cusineType+" food", key, language).enqueue(new Callback<PlacesResults>() {
+        googleMapAPI.getNearBy(currentLocation, radius, type, cusineType, key, language).enqueue(new Callback<PlacesResults>() {
             @Override
             public void onResponse(Call<PlacesResults> call, Response<PlacesResults> response) {
                 Result result;
@@ -647,10 +655,14 @@ public class FragmentMap extends Fragment
     }
 
     public MarkerOptions buildMarker(double latitude, double longitude, String name) {
+        BitmapDescriptor icon = bitmapDescriptorFromVector(mContext, R.drawable.ic_place_result_24dp);
+        if(name.equals("current location")){
+            icon = bitmapDescriptorFromVector(mContext, R.drawable.ic_place_black_24dp);
+        }
         return new MarkerOptions()
                 .position(new LatLng(latitude, longitude))
                 .title(name)
-                .icon(bitmapDescriptorFromVector(mContext, R.drawable.ic_place_result_24dp));
+                .icon(icon);
         //.icon(fragmentMap.bitmapDescriptorFromVector(fragmentMap.getContext(), R.drawable.ic_place_result_24dp));
     }
 

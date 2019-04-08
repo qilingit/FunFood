@@ -51,7 +51,7 @@ public class UpdateMap {
      * @param markerList
      */
     public void showMarker(GoogleMap map, ArrayList<MarkerOptions> markerList, List<Result> listResult) {
-
+        map.clear();
         for (int i=0; i<markerList.size(); i++) {
 
             map.addMarker(markerList.get(i));

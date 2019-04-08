@@ -19,8 +19,8 @@
     <string name="language">fr</string>
 
     <string-array name="spinner_array">
-        <item>Français</item>
         <item>Tous</item>
+        <item>Français</item>
         <item>Chinois</item>
         <item>Fast Food</item>
         <item>Japonais</item>
