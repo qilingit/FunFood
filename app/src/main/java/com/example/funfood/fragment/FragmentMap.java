@@ -124,7 +124,7 @@ public class FragmentMap extends Fragment
                                             getMyLocation();
                                             //myMap.setMyLocationEnabled(true);
                                             CameraPosition cameraCurrentLocation = CameraPosition.builder()
-                                                    .target(new LatLng(48.846900, 2.357449))
+                                                    .target(new LatLng(currentBestLocation.getLatitude(), currentBestLocation.getLongitude()))
                                                     .zoom(16)
                                                     .bearing(0)
                                                     .tilt(45)
@@ -132,7 +132,7 @@ public class FragmentMap extends Fragment
 
                                             myMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraCurrentLocation), 2000, null);
                                             myMap.addMarker(new MarkerOptions()
-                                                    .position(new LatLng(48.846900, 2.357449))
+                                                    .position(new LatLng(currentBestLocation.getLatitude(), currentBestLocation.getLongitude()))
                                                     .title("UPMC")
                                                     .icon(bitmapDescriptorFromVector(getActivity(), R.drawable.ic_place_black_24dp)));
                                             Log.d("FragmentMap", "addMarker");
@@ -197,6 +197,10 @@ public class FragmentMap extends Fragment
     }
 
     public void updateSearch(View rootView, final SupportMapFragment mapFragment ) {
+        //mGoogleMap.clear();
+        markerList.removeAll(markerList);
+        markerList.add(buildMarker(currentBestLocation.getLatitude(), currentBestLocation.getLongitude(), "current location"));
+
         // Spinner
         mySpinner = rootView.findViewById(R.id.spinnerType);
         mySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -208,9 +212,9 @@ public class FragmentMap extends Fragment
                 if(parent.getItemAtPosition(position).toString() != "Tous"){
 
                 }
-
                 requestRestaurant(parent.getItemAtPosition(position).toString());
 
+                updateMap.showMarker(mGoogleMap, markerList, results);
 
                 //updateMap.showMarker(myMap, markerList);
                 //Log.d("TpyeArrar", typeCuisineSpinner.toString());
@@ -226,6 +230,7 @@ public class FragmentMap extends Fragment
         mapFragment.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(GoogleMap myMap) {
+                mGoogleMap = myMap;
                 myMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
                 myMap.clear();
 
@@ -554,6 +559,7 @@ public class FragmentMap extends Fragment
                         result = results.get(i);
                         ///Log.d("===> Result", "name : " + results.get(i).getName() + ", place id : " + results.get(i).getPlaceId());
                         if(result != null) {
+
                             markerList.add(buildMarker(result.getGeometry().getLocation().getLatitude(), result.getGeometry().getLocation().getLongitude(), result.getName()));
                             //Log.d("marklist", markerList.get(i).getTitle());
                         }
@@ -562,6 +568,7 @@ public class FragmentMap extends Fragment
                     }
                     /*PlacesListAdapter placesListAdapter = new PlacesListAdapter(getApplicationContext(), results);
                     listViewPlaces.setAdapter(placesListAdapter);*/
+
                 } else {
                     Toast.makeText(mContext, "Failed", Toast.LENGTH_LONG).show();
                 }
