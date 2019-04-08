@@ -31,11 +31,9 @@ import com.example.funfood.api.APIClient;
 import com.example.funfood.api.GoogleMapAPI;
 import com.example.funfood.entities.PlacesResults;
 import com.example.funfood.entities.Result;
-import com.example.funfood.entities.ResultLocation;
 import com.example.funfood.functionnalities.UpdateMap;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.FusedLocationProviderClient;
 
 import android.location.LocationListener;
 import android.widget.AdapterView;
@@ -54,7 +52,6 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.libraries.places.api.model.Place;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -68,19 +65,16 @@ import static android.content.Context.LOCATION_SERVICE;
 public class FragmentMap extends Fragment
         implements OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener {
-    public ArrayList<MarkerOptions> markerList = new ArrayList<MarkerOptions>();
+        GoogleApiClient.OnConnectionFailedListener{
+    public ArrayList<MarkerOptions> markerList = new ArrayList<>();
     public List<Result> results;
     GoogleMap mGoogleMap;
     SupportMapFragment supportMapFragment;
     LocationRequest mLocationRequest;
     GoogleApiClient mGoogleApiClient;
-    private FusedLocationProviderClient mFusedLocationClient;
     Location mLastLocation;
     Marker mCurrLocationMarker;
     private static final String TAG = "FragmentMap";
-    private Boolean mLocationPermissionGranted = false;
-    private FusedLocationProviderClient fusedLocationProviderClient;
     public Context mContext;
     private LocationListener mLocationListener;
     private LocationManager mLocationManager;
@@ -89,6 +83,8 @@ public class FragmentMap extends Fragment
     private Location currentBestLocation = null;
     static final int TWO_MINUTES = 1000 * 60 * 2;
     private UpdateMap updateMap = new UpdateMap();
+    private View rootView;
+    private SupportMapFragment mapFragment;
 
     public FragmentMap() {
 
@@ -100,56 +96,15 @@ public class FragmentMap extends Fragment
         super.onCreate(savedInstanceState);
         mContext = getContext();
         mLocationManager = (LocationManager) mContext.getSystemService(LOCATION_SERVICE);
-        currentBestLocation = getLastBestLocation();
         getMyLocation();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        setUpMapIfNeed();
-    }
-
-    private void setUpMapIfNeed() {
-        if (mGoogleMap != null) {
-            // Check if we were successful in obtaining the map.
-        }
-    }
+        currentBestLocation = getLastBestLocation();
 
 
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        mContext = getContext();
-        View rootView = inflater.inflate(R.layout.fragment_map, container, false);
-        Log.d("OnCreateView", "Passed");
+
+        Log.d("OnCreate", "Passed");
         //use SuppoprtMapFragment for using in fragment instead of activity  FragmentMap = activity   SupportMapFragment = fragment
-        SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map_fragment);
+        mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map_fragment);
         //assert mapFragment != null;
-
-        // Spinner
-        mySpinner = rootView.findViewById(R.id.spinnerType);
-        mySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                String typeCuisine = parent.getItemAtPosition(position).toString();
-                Resources res = getResources();
-                //String[] typeCuisineSpinner = res.getStringArray(R.array.spinner_array);
-                if(parent.getItemAtPosition(position).toString() != "Tous"){
-
-                }
-                requestRestaurant(parent.getItemAtPosition(position).toString());
-
-
-                //updateMap.showMarker(myMap, markerList);
-                //Log.d("TpyeArrar", typeCuisineSpinner.toString());
-
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
 
         if (mapFragment == null) {
             FragmentManager fragmentManager = getFragmentManager();
@@ -158,7 +113,7 @@ public class FragmentMap extends Fragment
             fragmentTransaction.replace(R.id.map_fragment, mapFragment).commit();
         }
 
-/*        mapFragment.getMapAsync(new OnMapReadyCallback() {
+        mapFragment.getMapAsync(new OnMapReadyCallback() {
                                     @Override
                                     public void onMapReady(GoogleMap myMap) {
                                         if (myMap != null) {
@@ -178,7 +133,7 @@ public class FragmentMap extends Fragment
                                             myMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraCurrentLocation), 2000, null);
                                             myMap.addMarker(new MarkerOptions()
                                                     .position(new LatLng(48.846900, 2.357449))
-                                                    .title("current location")
+                                                    .title("UPMC")
                                                     .icon(bitmapDescriptorFromVector(getActivity(), R.drawable.ic_place_black_24dp)));
                                             Log.d("FragmentMap", "addMarker");
                                         }
@@ -186,8 +141,87 @@ public class FragmentMap extends Fragment
                                 }
 
         );
-        mapFragment.getMapAsync(this);*/
 
+        mapFragment.getMapAsync(this);
+    }
+
+    @Override
+    public void onAttachFragment(Fragment childFragment) {
+        super.onAttachFragment(childFragment);
+        Log.d("===>OnAttachFragment", "passed");
+    }
+
+    @Override
+    public void onResume() {
+        Log.d("===>OnResume", "passed");
+        super.onResume();
+        mapFragment.getMapAsync(this);
+        setUpMapIfNeed();
+    }
+
+    private void setUpMapIfNeed() {
+        if (mGoogleMap != null) {
+            // Check if we were successful in obtaining the map.
+        }
+    }
+
+
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        mContext = getContext();
+        rootView = inflater.inflate(R.layout.fragment_map, container, false);
+        //mapFragment.getMapAsync(this);
+
+        //updateSearch(rootView, mapFragment);
+        mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map_fragment);
+        //assert mapFragment != null;
+
+        updateSearch(rootView, mapFragment);
+        //mapFragment.getMapAsync(this);
+
+        Log.d("onCreateView", "Passed");
+        return rootView;
+    }
+
+    @Override
+    public void onDestroy() {
+        Log.d("===>onDestroy", "passed");
+        super.onDestroy();
+        mGoogleMap = null;
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        Log.d("===>onAttach", "passed");
+        super.onAttach(context);
+    }
+
+    public void updateSearch(View rootView, final SupportMapFragment mapFragment ) {
+        // Spinner
+        mySpinner = rootView.findViewById(R.id.spinnerType);
+        mySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String typeCuisine = parent.getItemAtPosition(position).toString();
+                Resources res = getResources();
+                //String[] typeCuisineSpinner = res.getStringArray(R.array.spinner_array);
+                if(parent.getItemAtPosition(position).toString() != "Tous"){
+
+                }
+
+                requestRestaurant(parent.getItemAtPosition(position).toString());
+
+
+                //updateMap.showMarker(myMap, markerList);
+                //Log.d("TpyeArrar", typeCuisineSpinner.toString());
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
 
         mapFragment.getMapAsync(new OnMapReadyCallback() {
             @Override
@@ -210,7 +244,7 @@ public class FragmentMap extends Fragment
                         .position(new LatLng(currentBestLocation.getLatitude(), currentBestLocation.getLongitude()))
                         .title("current location")
                         .icon(bitmapDescriptorFromVector(getActivity(), R.drawable.ic_place_black_24dp)));
-
+                Log.d("****mapUpdate", "passed");
 
                 myMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraCurrentLocation), 2000, null);
                 if(mGoogleMap == null) {
@@ -220,18 +254,19 @@ public class FragmentMap extends Fragment
                     Log.d("myMap", "vide");
                 }
                 if(results != null) {
-                    updateMap.showMarker(myMap, markerList, results);
+                    Log.d("****updateMarker", "passed");
+
                 }
+                updateMap.showMarker(myMap, markerList, results);
             }
         });
-
         mapFragment.getMapAsync(this);
-        return rootView;
     }
 
     // for passe to method onMayReady
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        Log.d("****onActivityCreated", "passed");
         super.onActivityCreated(savedInstanceState);
         mContext = getActivity();
 
@@ -278,11 +313,11 @@ public class FragmentMap extends Fragment
             }
         };
 
-
         if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TOD
-            System.exit(1);
+            //System.exit(1);
+            return;
         }
 
         mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 100,
@@ -301,7 +336,8 @@ public class FragmentMap extends Fragment
             // to handle the case where the user grants the permission. See the documentation
             // for ActivityCompat#requestPermissions for more details.
             //return TODO;
-            System.exit(1);
+            //System.exit(1);
+            checkLocationPermission();
         }
         Location locationGPS = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
         Location locationNet = mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
@@ -381,6 +417,28 @@ public class FragmentMap extends Fragment
                 //Location Permission already granted
                 buildGoogleApiClient();
                 mGoogleMap.setMyLocationEnabled(true);
+                /*if (googleMap != null) {
+                    googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+                    googleMap.clear();
+
+                    googleMap.getUiSettings().setAllGesturesEnabled(true);
+                    getMyLocation();
+                    //myMap.setMyLocationEnabled(true);
+                    CameraPosition cameraCurrentLocation = CameraPosition.builder()
+                            .target(new LatLng(48.846900, 2.357449))
+                            .zoom(16)
+                            .bearing(0)
+                            .tilt(45)
+                            .build();
+
+                    googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraCurrentLocation), 2000, null);
+                    googleMap.addMarker(new MarkerOptions()
+                            .position(new LatLng(48.846900, 2.357449))
+                            .title("UPMC")
+                            .icon(bitmapDescriptorFromVector(getActivity(), R.drawable.ic_place_black_24dp)));
+                    Log.d("FragmentMap", "addMarker");
+                }*/
+
             } else {
                 //Request Location Permission
                 checkLocationPermission();
@@ -391,19 +449,6 @@ public class FragmentMap extends Fragment
         }
     }
 
-    /*@Override
-public void onMapReady(GoogleMap googleMap) {
-    Log.d("===> OnMapRead", "Passed");
-    mGoogleMap = googleMap;
-    if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-            ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-        return;
-    }
-    mGoogleMap.setMyLocationEnabled(true);
-    mGoogleMap.animateCamera(CameraUpdateFactory.zoomTo(15));
-        *//*map.setOnMapLongClickListener(MapyFragment.this);
-        map.setOnMapClickListener(MapFragment.this);*//*
-}*/
 
     protected synchronized void buildGoogleApiClient(){
         mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
@@ -494,7 +539,6 @@ public void onMapReady(GoogleMap googleMap) {
         String key = mContext.getResources().getString(R.string.google_places_API_key);
         String type = mContext.getResources().getString(R.string.searchType);
         String language = mContext.getResources().getString(R.string.language);
-        Place place;
         if(results != null){
 
             results.removeAll(results);
@@ -528,8 +572,6 @@ public void onMapReady(GoogleMap googleMap) {
                 Toast.makeText(mContext, t.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
-
-
     }
 
     /**
@@ -604,4 +646,6 @@ public void onMapReady(GoogleMap googleMap) {
                 .icon(bitmapDescriptorFromVector(mContext, R.drawable.ic_place_result_24dp));
         //.icon(fragmentMap.bitmapDescriptorFromVector(fragmentMap.getContext(), R.drawable.ic_place_result_24dp));
     }
+
+
 }

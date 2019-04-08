@@ -73,6 +73,4 @@ public class UpdateMap {
         markerList.add(marker);
     }
 
-
-
 }
