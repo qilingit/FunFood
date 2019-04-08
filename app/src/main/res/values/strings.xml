@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">FunFood</string>
     <string name="google_maps_API_key">AIzaSyD_6VMj2hIvNySuIzflB2YkCw-wDTPnxdI</string>
+    <string name="google_places_API_key">AIzaSyB6dNuoKbbkJXU0OeEME3bg3mEcT4jCeKw</string>
     <string name="text_type">Quelle cuisine ?</string>
     <string name="go_button">GO</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
@@ -14,10 +15,12 @@
     <string name="favorite">Favoris</string>
     <string name="map">Map</string>
     <string name="about">A propos</string>
+    <string name="searchType">restaurant</string>
+    <string name="language">fr</string>
 
     <string-array name="spinner_array">
-        <item>Tous</item>
         <item>Français</item>
+        <item>Tous</item>
         <item>Chinois</item>
         <item>Fast Food</item>
         <item>Japonais</item>

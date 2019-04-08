@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
@@ -24,12 +25,22 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
 import com.example.funfood.R;
+import com.example.funfood.api.APIClient;
+import com.example.funfood.api.GoogleMapAPI;
+import com.example.funfood.entities.PlacesResults;
+import com.example.funfood.entities.Result;
+import com.example.funfood.entities.ResultLocation;
+import com.example.funfood.functionnalities.UpdateMap;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.FusedLocationProviderClient;
 
 import android.location.LocationListener;
+import android.widget.AdapterView;
+import android.widget.Spinner;
+import android.widget.Toast;
 
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
@@ -43,6 +54,14 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.libraries.places.api.model.Place;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 import static android.content.Context.LOCATION_SERVICE;
 
@@ -50,6 +69,8 @@ public class FragmentMap extends Fragment
         implements OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
+    public ArrayList<MarkerOptions> markerList = new ArrayList<MarkerOptions>();
+    public List<Result> results;
     GoogleMap mGoogleMap;
     SupportMapFragment supportMapFragment;
     LocationRequest mLocationRequest;
@@ -60,10 +81,14 @@ public class FragmentMap extends Fragment
     private static final String TAG = "FragmentMap";
     private Boolean mLocationPermissionGranted = false;
     private FusedLocationProviderClient fusedLocationProviderClient;
-    private Context mContext;
+    public Context mContext;
     private LocationListener mLocationListener;
     private LocationManager mLocationManager;
-    private LatLng currentLocation;
+    //private LatLng currentLocation;
+    private Spinner mySpinner;
+    private Location currentBestLocation = null;
+    static final int TWO_MINUTES = 1000 * 60 * 2;
+    private UpdateMap updateMap = new UpdateMap();
 
     public FragmentMap() {
 
@@ -75,10 +100,8 @@ public class FragmentMap extends Fragment
         super.onCreate(savedInstanceState);
         mContext = getContext();
         mLocationManager = (LocationManager) mContext.getSystemService(LOCATION_SERVICE);
-
+        currentBestLocation = getLastBestLocation();
         getMyLocation();
-
-
     }
 
     @Override
@@ -90,7 +113,6 @@ public class FragmentMap extends Fragment
     private void setUpMapIfNeed() {
         if (mGoogleMap != null) {
             // Check if we were successful in obtaining the map.
-
         }
     }
 
@@ -104,6 +126,31 @@ public class FragmentMap extends Fragment
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map_fragment);
         //assert mapFragment != null;
 
+        // Spinner
+        mySpinner = rootView.findViewById(R.id.spinnerType);
+        mySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String typeCuisine = parent.getItemAtPosition(position).toString();
+                Resources res = getResources();
+                //String[] typeCuisineSpinner = res.getStringArray(R.array.spinner_array);
+                if(parent.getItemAtPosition(position).toString() != "Tous"){
+
+                }
+                requestRestaurant(parent.getItemAtPosition(position).toString());
+
+
+                //updateMap.showMarker(myMap, markerList);
+                //Log.d("TpyeArrar", typeCuisineSpinner.toString());
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
         if (mapFragment == null) {
             FragmentManager fragmentManager = getFragmentManager();
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
@@ -111,7 +158,7 @@ public class FragmentMap extends Fragment
             fragmentTransaction.replace(R.id.map_fragment, mapFragment).commit();
         }
 
-        mapFragment.getMapAsync(new OnMapReadyCallback() {
+/*        mapFragment.getMapAsync(new OnMapReadyCallback() {
                                     @Override
                                     public void onMapReady(GoogleMap myMap) {
                                         if (myMap != null) {
@@ -119,7 +166,7 @@ public class FragmentMap extends Fragment
                                             myMap.clear();
 
                                             myMap.getUiSettings().setAllGesturesEnabled(true);
-                                                getMyLocation();
+                                            getMyLocation();
                                             //myMap.setMyLocationEnabled(true);
                                             CameraPosition cameraCurrentLocation = CameraPosition.builder()
                                                     .target(new LatLng(48.846900, 2.357449))
@@ -135,11 +182,49 @@ public class FragmentMap extends Fragment
                                                     .icon(bitmapDescriptorFromVector(getActivity(), R.drawable.ic_place_black_24dp)));
                                             Log.d("FragmentMap", "addMarker");
                                         }
-
                                     }
                                 }
 
         );
+        mapFragment.getMapAsync(this);*/
+
+
+        mapFragment.getMapAsync(new OnMapReadyCallback() {
+            @Override
+            public void onMapReady(GoogleMap myMap) {
+                myMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+                myMap.clear();
+
+
+                myMap.getUiSettings().setAllGesturesEnabled(true);
+                //getMyLocation();
+                //myMap.setMyLocationEnabled(true);
+                CameraPosition cameraCurrentLocation = CameraPosition.builder()
+                        .target(new LatLng(currentBestLocation.getLatitude(), currentBestLocation.getLongitude()))
+                        .zoom(16)
+                        .bearing(0)
+                        .tilt(45)
+                        .build();
+
+                myMap.addMarker(new MarkerOptions()
+                        .position(new LatLng(currentBestLocation.getLatitude(), currentBestLocation.getLongitude()))
+                        .title("current location")
+                        .icon(bitmapDescriptorFromVector(getActivity(), R.drawable.ic_place_black_24dp)));
+
+
+                myMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraCurrentLocation), 2000, null);
+                if(mGoogleMap == null) {
+                    Log.d("mGoogleMap", "vide");
+                }
+                if(myMap == null) {
+                    Log.d("myMap", "vide");
+                }
+                if(results != null) {
+                    updateMap.showMarker(myMap, markerList, results);
+                }
+            }
+        });
+
         mapFragment.getMapAsync(this);
         return rootView;
     }
@@ -159,17 +244,22 @@ public class FragmentMap extends Fragment
         supportMapFragment.getMapAsync(this);
     }
 
-    public void getMyLocation()
-    {
-        Log.d(TAG, "getDeviceLocation: getting the device current location");
+    public void getMyLocation() {
+        Log.d(TAG, "=> getDeviceLocation: getting the device current location");
         mLocationListener = new LocationListener() {
             @Override
             public void onLocationChanged(final Location location) {
+                makeUseOfNewLocation(location);
+
+                if (currentBestLocation == null){
+                    currentBestLocation = location;
+                }
+
                 //get current location
                 Log.d(TAG, "onLocationChanged: latitude " + location.getLatitude());
-                currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
+                /*currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
 
-                Log.d(TAG,"position actuelle : " + currentLocation.latitude + ", " + currentLocation.longitude);
+                Log.d(TAG, "position actuelle : " + currentLocation.latitude + ", " + currentLocation.longitude);*/
             }
 
             @Override
@@ -197,6 +287,41 @@ public class FragmentMap extends Fragment
 
         mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 100,
                 500, mLocationListener);
+
+    }
+
+    private Location getLastBestLocation() {
+        if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            //return TODO;
+            System.exit(1);
+        }
+        Location locationGPS = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        Location locationNet = mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+
+        long GPSLocationTime = 0;
+        if (null != locationGPS) { GPSLocationTime = locationGPS.getTime(); }
+
+        long NetLocationTime = 0;
+
+
+        if (null != locationNet) {
+            NetLocationTime = locationNet.getTime();
+        }
+
+        if ( 0 < GPSLocationTime - NetLocationTime ) {
+            return locationGPS;
+        }
+        else {
+            return locationNet;
+        }
     }
 
     /*private void getLocationPermission() {
@@ -224,7 +349,7 @@ public class FragmentMap extends Fragment
         }
 
     }*/
-    private BitmapDescriptor bitmapDescriptorFromVector(Context context, int vectorResId) {
+    public BitmapDescriptor bitmapDescriptorFromVector(Context context, int vectorResId) {
         Drawable vectorDrawable = ContextCompat.getDrawable(context, vectorResId);
         vectorDrawable.setBounds(0, 0, vectorDrawable.getIntrinsicWidth(), vectorDrawable.getIntrinsicHeight());
         Bitmap bitmap = Bitmap.createBitmap(vectorDrawable.getIntrinsicWidth(), vectorDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
@@ -247,7 +372,7 @@ public class FragmentMap extends Fragment
     public void onMapReady(GoogleMap googleMap) {
         mGoogleMap=googleMap;
         mGoogleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-        Log.d("==| OnMapRead", "Passed");
+        Log.d("==> OnMapReady", "Passed");
         // Initialize Google play service
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
             if (ContextCompat.checkSelfPermission(getActivity(),
@@ -357,4 +482,126 @@ public void onMapReady(GoogleMap googleMap) {
 
     }
 
+    /**/
+    public void requestRestaurant(String cusineType){
+        Log.d("request", "clicked" + ", Type" + cusineType);
+        //Log.d("Position", String.valueOf(currentLocation.latitude) + String.valueOf(currentLocation.longitude));
+        Log.d("Position", String.valueOf(currentBestLocation.getLatitude()) + ", " + String.valueOf(currentBestLocation.getLongitude()));
+
+        String currentLocation = String.valueOf(currentBestLocation.getLatitude()+","+currentBestLocation.getLongitude());
+        // research part
+        int radius = mContext.getResources().getInteger(R.integer.searcheRadius);
+        String key = mContext.getResources().getString(R.string.google_places_API_key);
+        String type = mContext.getResources().getString(R.string.searchType);
+        String language = mContext.getResources().getString(R.string.language);
+        Place place;
+        if(results != null){
+
+            results.removeAll(results);
+        }
+        GoogleMapAPI googleMapAPI = APIClient.getClient().create(GoogleMapAPI.class);
+        googleMapAPI.getNearBy(currentLocation, radius, type, cusineType+" food", key, language).enqueue(new Callback<PlacesResults>() {
+            @Override
+            public void onResponse(Call<PlacesResults> call, Response<PlacesResults> response) {
+                Result result;
+                if (response.isSuccessful()) {
+                    results = response.body().getResults();
+                    for (int i=0; i<results.size(); i++){
+                        result = results.get(i);
+                        ///Log.d("===> Result", "name : " + results.get(i).getName() + ", place id : " + results.get(i).getPlaceId());
+                        if(result != null) {
+                            markerList.add(buildMarker(result.getGeometry().getLocation().getLatitude(), result.getGeometry().getLocation().getLongitude(), result.getName()));
+                            //Log.d("marklist", markerList.get(i).getTitle());
+                        }
+
+                        //Log.d("position", "latitude : " + results.get(i).getGeometry().getLocation().getLatitude() + ", longitude : " + results.get(i).getGeometry().getLocation().getLongitude());
+                    }
+                    /*PlacesListAdapter placesListAdapter = new PlacesListAdapter(getApplicationContext(), results);
+                    listViewPlaces.setAdapter(placesListAdapter);*/
+                } else {
+                    Toast.makeText(mContext, "Failed", Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<PlacesResults> call, Throwable t) {
+                Toast.makeText(mContext, t.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
+
+
+    }
+
+    /**
+     * This method modify the last know good location according to the arguments.
+     *
+     * @param location The possible new location.
+     */
+    void makeUseOfNewLocation(Location location) {
+        if ( isBetterLocation(location, currentBestLocation) ) {
+            currentBestLocation = location;
+        }
+    }
+
+    /** Determines whether one location reading is better than the current location fix
+     * @param location  The new location that you want to evaluate
+     * @param currentBestLocation  The current location fix, to which you want to compare the new one.
+     */
+    protected boolean isBetterLocation(Location location, Location currentBestLocation) {
+        if (currentBestLocation == null) {
+            // A new location is always better than no location
+            return true;
+        }
+
+        // Check whether the new location fix is newer or older
+        long timeDelta = location.getTime() - currentBestLocation.getTime();
+        boolean isSignificantlyNewer = timeDelta > TWO_MINUTES;
+        boolean isSignificantlyOlder = timeDelta < -TWO_MINUTES;
+        boolean isNewer = timeDelta > 0;
+
+        // If it's been more than two minutes since the current location, use the new location,
+        // because the user has likely moved.
+        if (isSignificantlyNewer) {
+            return true;
+            // If the new location is more than two minutes older, it must be worse.
+        } else if (isSignificantlyOlder) {
+            return false;
+        }
+
+        // Check whether the new location fix is more or less accurate
+        int accuracyDelta = (int) (location.getAccuracy() - currentBestLocation.getAccuracy());
+        boolean isLessAccurate = accuracyDelta > 0;
+        boolean isMoreAccurate = accuracyDelta < 0;
+        boolean isSignificantlyLessAccurate = accuracyDelta > 200;
+
+        // Check if the old and new location are from the same provider
+        boolean isFromSameProvider = isSameProvider(location.getProvider(),
+                currentBestLocation.getProvider());
+
+        // Determine location quality using a combination of timeliness and accuracy
+        if (isMoreAccurate) {
+            return true;
+        } else if (isNewer && !isLessAccurate) {
+            return true;
+        } else if (isNewer && !isSignificantlyLessAccurate && isFromSameProvider) {
+            return true;
+        }
+        return false;
+    }
+
+    // Checks whether two providers are the same
+    private boolean isSameProvider(String provider1, String provider2) {
+        if (provider1 == null) {
+            return provider2 == null;
+        }
+        return provider1.equals(provider2);
+    }
+
+    public MarkerOptions buildMarker(double latitude, double longitude, String name) {
+        return new MarkerOptions()
+                .position(new LatLng(latitude, longitude))
+                .title(name)
+                .icon(bitmapDescriptorFromVector(mContext, R.drawable.ic_place_result_24dp));
+        //.icon(fragmentMap.bitmapDescriptorFromVector(fragmentMap.getContext(), R.drawable.ic_place_result_24dp));
+    }
 }
