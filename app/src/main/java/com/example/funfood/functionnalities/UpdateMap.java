@@ -50,13 +50,14 @@ public class UpdateMap {
      * @param map
      * @param markerList
      */
-    public void showMarker(GoogleMap map, ArrayList<MarkerOptions> markerList, List<Result> listResult) {
+    public void showMarker(GoogleMap map, List<MarkerOptions> markerList, List<Result> listResult) {
         map.clear();
-        for (int i=0; i<markerList.size(); i++) {
-
-            map.addMarker(markerList.get(i));
-            //System.out.println("Test show marker : " + markerList.get(i).getTitle());
+        for (MarkerOptions marker:markerList){
+            map.addMarker(marker);
         }
+
+            //System.out.println("Test show marker : " + markerList.get(i).getTitle());
+
     }
 
     /**
