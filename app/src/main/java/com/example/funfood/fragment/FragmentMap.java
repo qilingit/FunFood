@@ -552,6 +552,7 @@ public class FragmentMap extends Fragment
         String key = mContext.getResources().getString(R.string.google_places_API_key);
         String type = mContext.getResources().getString(R.string.searchType);
         String language = mContext.getResources().getString(R.string.language);
+        cusineType = switchName(cusineType);
         if(results != null){
 
             results.removeAll(results);
@@ -664,6 +665,21 @@ public class FragmentMap extends Fragment
                 .title(name)
                 .icon(icon);
         //.icon(fragmentMap.bitmapDescriptorFromVector(fragmentMap.getContext(), R.drawable.ic_place_result_24dp));
+    }
+
+    public String switchName(String oldName) {
+        String newName = oldName;
+        if (oldName.equals("Français")){
+            newName = "french";
+        }
+        if (oldName.equals("Japonais")){
+            newName = "japon";
+        }
+        if (oldName.equals("Chinois")){
+            newName = "chinese";
+        }
+        return newName;
+
     }
 
 
