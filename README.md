@@ -1,5 +1,6 @@
 # FunFood
 ## Projet de cours Master2 STL_INSTA TPALT
+FunFood is an application Android which we can use it to search the different restaurants with different type of cook, such as Chinse, French, Japanese, Pizza, Fast Food, etc. and show them on a integrated Google Map.
 
 ### How to create and commit to branch "test" for example :
 
