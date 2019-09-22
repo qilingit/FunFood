@@ -17,7 +17,7 @@ FunFood is an application Android which we can use it to search the different re
 - 4, `git push origin master`
 - 5, `git status` (for verify everything is pushed)
 
-### How to pull codes from master quand on est sur  une branche "test" :
+### How to pull codes from master when we are at branch "test" :
 
 - 1, git checkout test      # gets you "on branch test"
 - 2, git fetch origin        # gets you up to date with origin
